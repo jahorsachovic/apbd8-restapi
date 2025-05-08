@@ -1,0 +1,7 @@
+sudo docker run -e "ACCEPT_EULA=Y" -e "MSSQL_SA_PASSWORD=YhP4sswd" -p 1433:1433 -d mcr.microsoft.com/mssql/server:2022-latest
+
+For master catalog
+Data Source=localhost, 1433; User=SA; Password=YhP4sswd; Initial Catalog=apbd; Integrated Security=False; Connect Timeout=30; Encrypt=False; Trust Server Certificate=False
+
+For apbd catalog (if such exists)
+Data Source=localhost, 1433; User=SA; Password=YhP4sswd; Integrated Security=False; Connect Timeout=30; Encrypt=False; Trust Server Certificate=False
