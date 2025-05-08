@@ -11,10 +11,10 @@ public class TripsService : ITripsService
     {
         var trips = new List<TripDTO>();
 
-        string command = "SELECT IdTrip, Name FROM Trip";
+        string query = "SELECT * FROM Trip";
         
         using (SqlConnection conn = new SqlConnection(_connectionString))
-        using (SqlCommand cmd = new SqlCommand(command, conn))
+        using (SqlCommand cmd = new SqlCommand(query, conn))
         {
             await conn.OpenAsync();
 
@@ -27,6 +27,10 @@ public class TripsService : ITripsService
                     {
                         Id = reader.GetInt32(idOrdinal),
                         Name = reader.GetString(1),
+                        Description = reader.GetString(2),
+                        DateFrom = reader.GetDateTime(3),
+                        DateTo = reader.GetDateTime(4),
+                        MaxPeople = reader.GetInt32(5)
                     });
                 }
             }
@@ -40,7 +44,7 @@ public class TripsService : ITripsService
     {
         var trip = new TripDTO();
 
-        string query = "SELECT IdTrip, Name FROM Trip WHERE IdTrip = @id";
+        string query = "SELECT * FROM Trip WHERE IdTrip = @id";
         
         using (SqlConnection conn = new SqlConnection(_connectionString))
         using (SqlCommand cmd = new SqlCommand(query, conn))
@@ -56,7 +60,11 @@ public class TripsService : ITripsService
                     return new TripDTO
                     {
                         Id = reader.GetInt32(reader.GetOrdinal("IdTrip")),
-                        Name = reader.GetString(reader.GetOrdinal("Name"))
+                        Name = reader.GetString(reader.GetOrdinal("Name")),
+                        Description = reader.GetString(reader.GetOrdinal("Description")),
+                        DateFrom = reader.GetDateTime(reader.GetOrdinal("DateFrom")),
+                        DateTo = reader.GetDateTime(reader.GetOrdinal("DateTo")),
+                        MaxPeople = reader.GetInt32(reader.GetOrdinal("MaxPeople"))
                     };
                 }
             }
