@@ -35,4 +35,34 @@ public class TripsService : ITripsService
 
         return trips;
     }
+    
+    public async Task<TripDTO?> GetTrip(int id)
+    {
+        var trip = new TripDTO();
+
+        string query = "SELECT IdTrip, Name FROM Trip WHERE IdTrip = @id";
+        
+        using (SqlConnection conn = new SqlConnection(_connectionString))
+        using (SqlCommand cmd = new SqlCommand(query, conn))
+        {
+            cmd.Parameters.AddWithValue("@id", id);
+            
+            await conn.OpenAsync();
+
+            using (var reader = await cmd.ExecuteReaderAsync())
+            {
+                while (await reader.ReadAsync())
+                {
+                    return new TripDTO
+                    {
+                        Id = reader.GetInt32(reader.GetOrdinal("IdTrip")),
+                        Name = reader.GetString(reader.GetOrdinal("Name"))
+                    };
+                }
+            }
+        }
+
+
+        return null;
+    }
 }

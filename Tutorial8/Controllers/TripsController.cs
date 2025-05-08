@@ -25,11 +25,16 @@ namespace Tutorial8.Controllers
         [HttpGet("{id}")]
         public async Task<IActionResult> GetTrip(int id)
         {
+            var trip = await _tripsService.GetTrip(id);
             // if( await DoesTripExist(id)){
             //  return NotFound();
             // }
-            // var trip = ... GetTrip(id);
-            return Ok();
+
+            if (trip == null)
+            {
+                return NotFound($"Trip with id {id} not found.");
+            }
+            return Ok(trip);
         }
     }
 }
