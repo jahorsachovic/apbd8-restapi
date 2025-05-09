@@ -4,5 +4,5 @@ namespace Tutorial8.Services;
 
 public interface IClientsService
 {
-    Task<List<TripDTO>?> GetClientTrips(int id);
+    Task<List<ClientTripDTO>?> GetClientTrips(int id);
 }

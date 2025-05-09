@@ -14,11 +14,11 @@ public class ClientsService : IClientsService
         _connectionString = config.GetConnectionString("DefaultConnectionString");
     }
     
-    public async Task<List<TripDTO>?> GetClientTrips(int id)
+    public async Task<List<ClientTripDTO>?> GetClientTrips(int id)
     {
-        var trips = new List<TripDTO>();
+        var trips = new List<ClientTripDTO>();
 
-        string command = "SELECT t.IdTrip, t.Name, t.Description, t.DateFrom, t.DateTo, t.MaxPeople FROM Trip t JOIN Client_Trip ct ON t.IdTrip = ct.IdTrip WHERE ct.IdClient = @id";
+        string command = "SELECT t.IdTrip, t.Name, t.Description, t.DateFrom, t.DateTo, t.MaxPeople, ct.RegisteredAt, ct.PaymentDate FROM Trip t JOIN Client_Trip ct ON t.IdTrip = ct.IdTrip WHERE ct.IdClient = @id";
         
         using (SqlConnection conn = new SqlConnection(_connectionString))
         using (SqlCommand cmd = new SqlCommand(command, conn))
@@ -32,10 +32,16 @@ public class ClientsService : IClientsService
                 while (await reader.ReadAsync())
                 {
                     int idOrdinal = reader.GetOrdinal("IdTrip");
-                    trips.Add(new TripDTO()
+                    trips.Add(new ClientTripDTO()
                     {
                         Id = reader.GetInt32(idOrdinal),
                         Name = reader.GetString(1),
+                        Description = reader.GetString(2),
+                        DateFrom = reader.GetDateTime(3),
+                        DateTo = reader.GetDateTime(4),
+                        MaxPeople = reader.GetInt32(5),
+                        RegisteredAt = reader.GetInt32(6),
+                        PaymentDate = reader.GetInt32(7)
                     });
                 }
             }

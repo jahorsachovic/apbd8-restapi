@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.IdentityModel.Tokens;
 using Tutorial8.Services;
 
 namespace Tutorial8.Controllers
@@ -20,9 +21,9 @@ namespace Tutorial8.Controllers
         {
             var clientTrips = await _clientsService.GetClientTrips(id);
 
-            if (clientTrips == null)
+            if (clientTrips.IsNullOrEmpty())
             {
-                return NotFound($"Client does not have any trips.");
+                return NotFound($"Client does not have any trips or does not exist.");
             }
             
             return Ok(clientTrips);
