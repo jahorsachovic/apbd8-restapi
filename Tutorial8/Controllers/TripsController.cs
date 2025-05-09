@@ -4,7 +4,7 @@ using Tutorial8.Services;
 
 namespace Tutorial8.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/trips")]
     [ApiController]
     public class TripsController : ControllerBase
     {
@@ -15,6 +15,7 @@ namespace Tutorial8.Controllers
             _tripsService = tripsService;
         }
         
+        // This endpoint retrieves all available trips with their basic information.
         [HttpGet]
         public async Task<IActionResult> GetTrips()
         {

@@ -1,11 +1,12 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
+using Tutorial8.Models.DTOs;
 using Tutorial8.Services;
 
 namespace Tutorial8.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/clients")]
     [ApiController]
     public class ClientsController : ControllerBase
     {
@@ -16,6 +17,8 @@ namespace Tutorial8.Controllers
             _clientsService = clientsService;
         }
         
+        
+        // This endpoint retrieves all trips associated with a specific client.
         [HttpGet("{id}/trips")]
         public async Task<IActionResult> GetClientTrips(int id)
         {
@@ -27,6 +30,35 @@ namespace Tutorial8.Controllers
             }
             
             return Ok(clientTrips);
+        }
+
+        // This endpoint creates a new client record.
+        [HttpPost]
+        public async Task<IActionResult> AddClient([FromBody] ClientDTO client)
+        {
+
+            var newClientId = _clientsService.AddClient(client);
+            
+            return Ok($"Client with id {newClientId.Result} was created.");
+        }
+
+        // This endpoint registers a client for a specific trip.
+        [HttpPut("{id}/trips/{tripId}")]
+        public async Task<IActionResult> AssignClientRegistration(int id, int tripId)
+        {
+            
+            
+            
+            return Ok();
+        }
+
+        // This endpoint removes a client's registration from a trip.
+        [HttpPut("{id}/trips/{tripdId}")]
+        public async Task<IActionResult> DeleteClientRegistration(int id, int tripId)
+        {
+
+
+            return Ok();
         }
     }
 }
