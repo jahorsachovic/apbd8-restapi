@@ -19,6 +19,12 @@ namespace Tutorial8.Controllers
         public async Task<IActionResult> GetClientTrips(int id)
         {
             var clientTrips = await _clientsService.GetClientTrips(id);
+
+            if (clientTrips == null)
+            {
+                return NotFound($"Client does not have any trips.");
+            }
+            
             return Ok(clientTrips);
         }
     }
