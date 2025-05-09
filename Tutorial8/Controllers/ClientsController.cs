@@ -17,7 +17,6 @@ namespace Tutorial8.Controllers
             _clientsService = clientsService;
         }
         
-        
         // This endpoint retrieves all trips associated with a specific client.
         [HttpGet("{id}/trips")]
         public async Task<IActionResult> GetClientTrips(int id)
@@ -46,14 +45,20 @@ namespace Tutorial8.Controllers
         [HttpPut("{id}/trips/{tripId}")]
         public async Task<IActionResult> AssignClientRegistration(int id, int tripId)
         {
+
+            var result = await _clientsService.AssignClientRegistration(id, tripId);
+
+            if (!result.IsSuccess)
+            {
+                return BadRequest(result.Message);
+            }
+                
             
-            
-            
-            return Ok();
+            return Ok(result.Message);
         }
 
         // This endpoint removes a client's registration from a trip.
-        [HttpPut("{id}/trips/{tripdId}")]
+        [HttpDelete("{id}/trips/{tripdId}")]
         public async Task<IActionResult> DeleteClientRegistration(int id, int tripId)
         {
 

@@ -1,3 +1,5 @@
+using System.Data;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.Data.SqlClient;
 using Tutorial8.Models.DTOs;
 
@@ -13,7 +15,8 @@ public class ClientsService : IClientsService
     {
         _connectionString = config.GetConnectionString("DefaultConnectionString");
     }
-
+    
+    // This method
     public async Task<int> AddClient(ClientDTO client)
     {
 
@@ -43,11 +46,43 @@ public class ClientsService : IClientsService
         return Convert.ToInt32(newClientId);
     }
 
+    public async Task<(bool IsSuccess, string Message)> AssignClientRegistration(int id, int tripId)
+    {
+
+        int result;
+
+        string query =
+            "INSERT INTO Client_Trip (IdClient, IdTrip, RegisteredAt) SELECT @IdClient, @IdTrip, CONVERT(int, CONVERT(varchar(8), GETDATE(), 112)) WHERE EXISTS (SELECT 1 FROM Client WHERE IdClient = @IdClient) AND EXISTS (SELECT 1 FROM Trip WHERE IdTrip = @IdTrip);";
+        
+        using (SqlConnection conn = new SqlConnection(_connectionString))
+        using (SqlCommand cmd = new SqlCommand(query, conn))
+        {
+            cmd.Parameters.AddWithValue("@IdClient", id);
+            cmd.Parameters.AddWithValue("@IdTrip", tripId);
+            
+            await conn.OpenAsync();
+            result = await cmd.ExecuteNonQueryAsync();
+        }
+
+        if (result == 0)
+        {
+            return (false, "The client or a trip might not exist");
+        }
+
+
+        return (true, "Client was assigned a trip successfully");
+    }
+
+
+    // This method returns the list of all Trips assigned to the provided client
     public async Task<List<ClientTripDTO>?> GetClientTrips(int id)
     {
         var trips = new List<ClientTripDTO>();
 
-        string query = "SELECT t.IdTrip, t.Name, t.Description, t.DateFrom, t.DateTo, t.MaxPeople, ct.RegisteredAt, ct.PaymentDate FROM Trip t JOIN Client_Trip ct ON t.IdTrip = ct.IdTrip WHERE ct.IdClient = @id";
+        
+        // This query returns all the fields from Trip table and necessary fields from Client_Trip table
+        // joining Trip and Client_Trip together thus retrieving only Trips assigned to that Client
+        string query = "SELECT t.*, ct.RegisteredAt, ct.PaymentDate FROM Trip t JOIN Client_Trip ct ON t.IdTrip = ct.IdTrip WHERE ct.IdClient = @id";
         
         using (SqlConnection conn = new SqlConnection(_connectionString))
         using (SqlCommand cmd = new SqlCommand(query, conn))
@@ -60,17 +95,18 @@ public class ClientsService : IClientsService
             {
                 while (await reader.ReadAsync())
                 {
-                    int idOrdinal = reader.GetOrdinal("IdTrip");
+                    
                     trips.Add(new ClientTripDTO()
                     {
-                        Id = reader.GetInt32(idOrdinal),
+                        Id = reader.GetInt32(0),
                         Name = reader.GetString(1),
                         Description = reader.GetString(2),
                         DateFrom = reader.GetDateTime(3),
                         DateTo = reader.GetDateTime(4),
                         MaxPeople = reader.GetInt32(5),
                         RegisteredAt = reader.GetInt32(6),
-                        PaymentDate = reader.GetInt32(7)
+                        PaymentDate = reader.IsDBNull(7) ? 0 : reader.GetInt32(7)
+                        
                     });
                 }
             }

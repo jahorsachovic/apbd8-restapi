@@ -1,3 +1,5 @@
+using System.Runtime.CompilerServices;
+
 namespace Tutorial8.Models.DTOs;
 
 public class ClientTripDTO
